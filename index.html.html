@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<!--
+    STARTUP PITCH COMPETITION 2025 - VOTING TOOL
+    
+    INSTRUCTOR PASSWORD: Manchester2025 (change this before deploying!)
+    
+    Students select their Student ID from dropdown
+    Their group is automatically determined
+    They cannot vote for their own group
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startup Pitch Competition 2025 - Voting</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a1a2e;
+            --accent: #d4af37;
+            --light: #f8f9fa;
+            --border: #e0e0e0;
+            --text: #2c3e50;
+            --text-light: #6c757d;
+            --success: #28a745;
+            --error: #dc3545;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text);
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 48px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 24px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            font-family: 'Work Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:hover {
+            border-color: #667eea;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Work Sans', sans-serif;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .success-icon::after {
+            content: '✓';
+            font-size: 48px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .admin-link {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .admin-link a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .admin-link a:hover {
+            color: #667eea;
+        }
+
+        .results-container {
+            margin-top: 32px;
+        }
+
+        .result-category {
+            background: var(--light);
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .result-category h3 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-team {
+            font-weight: 500;
+        }
+
+        .result-votes {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .winner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .winner .result-team {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .total-votes {
+            text-align: center;
+            color: var(--text-light);
+            margin-top: 16px;
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            color: #004085;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Student Selection Screen -->
+    <div class="container screen active" id="studentScreen">
+        <h1>Startup Pitch Competition 2025</h1>
+        <p class="subtitle">Vote for the best startup ideas and pitches</p>
+        
+        <div class="info-box">
+            Select your Student ID below. Your group will be automatically determined and you cannot vote for your own group.
+        </div>
+        
+        <div class="error-message" id="studentError"></div>
+        
+        <div class="form-group">
+            <label for="studentSelect">Select Your Student ID</label>
+            <select id="studentSelect">
+                <option value="">Select your Student ID...</option>
+                <option value="10685144" data-group="7">10685144 (Group 7)</option>
+                <option value="10851871" data-group="1">10851871 (Group 1)</option>
+                <option value="10870756" data-group="2">10870756 (Group 2)</option>
+                <option value="10892612" data-group="2">10892612 (Group 2)</option>
+                <option value="10980853" data-group="7">10980853 (Group 7)</option>
+                <option value="11168673" data-group="8">11168673 (Group 8)</option>
+                <option value="11169120" data-group="1">11169120 (Group 1)</option>
+                <option value="11521909" data-group="2">11521909 (Group 2)</option>
+                <option value="11543565" data-group="7">11543565 (Group 7)</option>
+                <option value="11591716" data-group="3">11591716 (Group 3)</option>
+                <option value="11621611" data-group="11">11621611 (Group 11)</option>
+                <option value="14125994" data-group="8">14125994 (Group 8)</option>
+                <option value="14159830" data-group="4">14159830 (Group 4)</option>
+                <option value="14182659" data-group="4">14182659 (Group 4)</option>
+                <option value="14190856" data-group="8">14190856 (Group 8)</option>
+                <option value="14194944" data-group="9">14194944 (Group 9)</option>
+                <option value="14195046" data-group="5">14195046 (Group 5)</option>
+                <option value="14196002" data-group="5">14196002 (Group 5)</option>
+                <option value="14197090" data-group="3">14197090 (Group 3)</option>
+                <option value="14198354" data-group="9">14198354 (Group 9)</option>
+                <option value="14199494" data-group="10">14199494 (Group 10)</option>
+                <option value="14200583" data-group="10">14200583 (Group 10)</option>
+                <option value="14202924" data-group="11">14202924 (Group 11)</option>
+                <option value="14207485" data-group="3">14207485 (Group 3)</option>
+                <option value="14209193" data-group="12">14209193 (Group 12)</option>
+                <option value="14210495" data-group="7">14210495 (Group 7)</option>
+                <option value="14211817" data-group="10">14211817 (Group 10)</option>
+                <option value="14215218" data-group="6">14215218 (Group 6)</option>
+                <option value="14220689" data-group="3">14220689 (Group 3)</option>
+                <option value="14221413" data-group="8">14221413 (Group 8)</option>
+                <option value="14224463" data-group="6">14224463 (Group 6)</option>
+                <option value="14227527" data-group="1">14227527 (Group 1)</option>
+                <option value="14231714" data-group="11">14231714 (Group 11)</option>
+                <option value="14239826" data-group="7">14239826 (Group 7)</option>
+                <option value="14242266" data-group="9">14242266 (Group 9)</option>
+                <option value="14244283" data-group="8">14244283 (Group 8)</option>
+                <option value="14245947" data-group="10">14245947 (Group 10)</option>
+                <option value="14250648" data-group="5">14250648 (Group 5)</option>
+                <option value="14257571" data-group="1">14257571 (Group 1)</option>
+                <option value="14265038" data-group="3">14265038 (Group 3)</option>
+                <option value="14265090" data-group="6">14265090 (Group 6)</option>
+                <option value="14274246" data-group="1">14274246 (Group 1)</option>
+                <option value="14274288" data-group="2">14274288 (Group 2)</option>
+                <option value="14279000" data-group="5">14279000 (Group 5)</option>
+                <option value="14286710" data-group="12">14286710 (Group 12)</option>
+                <option value="14295502" data-group="10">14295502 (Group 10)</option>
+                <option value="14319623" data-group="4">14319623 (Group 4)</option>
+                <option value="14320829" data-group="12">14320829 (Group 12)</option>
+                <option value="14321673" data-group="6">14321673 (Group 6)</option>
+                <option value="14322163" data-group="2">14322163 (Group 2)</option>
+                <option value="14328482" data-group="11">14328482 (Group 11)</option>
+                <option value="14331071" data-group="12">14331071 (Group 12)</option>
+                <option value="14332179" data-group="4">14332179 (Group 4)</option>
+                <option value="14340363" data-group="9">14340363 (Group 9)</option>
+                <option value="14343940" data-group="5">14343940 (Group 5)</option>
+                <option value="14346900" data-group="11">14346900 (Group 11)</option>
+                <option value="14353491" data-group="9">14353491 (Group 9)</option>
+                <option value="14354853" data-group="4">14354853 (Group 4)</option>
+                <option value="14360714" data-group="6">14360714 (Group 6)</option>
+            </select>
+        </div>
+        
+        <button onclick="proceedToVoting()">Continue to Voting</button>
+        
+        <div class="admin-link">
+            <a href="#" onclick="showAdmin(); return false;">View Results (Instructor Only)</a>
+        </div>
+    </div>
+
+    <!-- Voting Screen -->
+    <div class="container screen" id="votingScreen">
+        <h1>Cast Your Votes</h1>
+        <p class="subtitle">Select the best in each category</p>
+        
+        <div class="error-message" id="voteError"></div>
+        
+        <div class="form-group">
+            <label for="ideaVote">Best Startup Idea</label>
+            <select id="ideaVote">
+                <option value="">Select a team...</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="pitchVote">Best Startup Pitch</label>
+            <select id="pitchVote">
+                <option value="">Select a team...</option>
+            </select>
+        </div>
+        
+        <button onclick="submitVotes()">Submit Votes</button>
+    </div>
+
+    <!-- Success Screen -->
+    <div class="container screen" id="successScreen">
+        <div class="success-icon"></div>
+        <h2 style="text-align: center;">Thank You for Voting!</h2>
+        <p style="text-align: center; color: var(--text-light);">Your votes have been recorded successfully.</p>
+    </div>
+
+    <!-- Admin Results Screen -->
+    <div class="container screen" id="adminScreen">
+        <h1>Voting Results</h1>
+        <p class="subtitle">Startup Pitch Competition 2025</p>
+        
+        <div class="results-container" id="resultsContainer">
+            <!-- Results will be inserted here -->
+        </div>
+        
+        <button onclick="exportResults()">Export Results as CSV</button>
+        <button onclick="resetVotesAdmin()" style="margin-top: 12px; background: #dc3545;">Reset All Votes (Testing)</button>
+        <button onclick="showStudentScreen()" style="margin-top: 12px; background: #6c757d;">Back to Voting</button>
+    </div>
+
+    <script>
+        // Initialize vote storage
+        if (!localStorage.getItem('votes')) {
+            localStorage.setItem('votes', JSON.stringify({
+                idea: {},
+                pitch: {}
+            }));
+        }
+
+        // Initialize voted users set
+        if (!localStorage.getItem('votedUsers')) {
+            localStorage.setItem('votedUsers', JSON.stringify([]));
+        }
+
+        let userGroup = null;
+        let studentId = null;
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showStudentScreen() {
+            userGroup = null;
+            studentId = null;
+            document.getElementById('studentSelect').value = '';
+            showScreen('studentScreen');
+        }
+
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            setTimeout(() => {
+                errorEl.classList.remove('show');
+            }, 5000);
+        }
+
+        function proceedToVoting() {
+            const studentSelect = document.getElementById('studentSelect');
+            studentId = studentSelect.value;
+            
+            if (!studentId) {
+                showError('studentError', 'Please select your Student ID to continue.');
+                return;
+            }
+
+            // Get the group from the selected option
+            const selectedOption = studentSelect.options[studentSelect.selectedIndex];
+            userGroup = selectedOption.getAttribute('data-group');
+
+            // Check if this student has already voted
+            const votedUsers = JSON.parse(localStorage.getItem('votedUsers'));
+            if (votedUsers.includes(studentId)) {
+                showError('studentError', 'You have already voted. Each student can only vote once.');
+                return;
+            }
+
+            // Populate voting dropdowns (excluding user's own group)
+            const ideaSelect = document.getElementById('ideaVote');
+            const pitchSelect = document.getElementById('pitchVote');
+            
+            ideaSelect.innerHTML = '<option value="">Select a team...</option>';
+            pitchSelect.innerHTML = '<option value="">Select a team...</option>';
+            
+            for (let i = 1; i <= 12; i++) {
+                if (i.toString() !== userGroup) {
+                    ideaSelect.innerHTML += `<option value="${i}">Team ${i}</option>`;
+                    pitchSelect.innerHTML += `<option value="${i}">Team ${i}</option>`;
+                }
+            }
+            
+            showScreen('votingScreen');
+        }
+
+        function submitVotes() {
+            const ideaVote = document.getElementById('ideaVote').value;
+            const pitchVote = document.getElementById('pitchVote').value;
+            
+            if (!ideaVote || !pitchVote) {
+                showError('voteError', 'Please select a team for both categories.');
+                return;
+            }
+
+            // Record votes
+            const votes = JSON.parse(localStorage.getItem('votes'));
+            votes.idea[ideaVote] = (votes.idea[ideaVote] || 0) + 1;
+            votes.pitch[pitchVote] = (votes.pitch[pitchVote] || 0) + 1;
+            localStorage.setItem('votes', JSON.stringify(votes));
+
+            // Mark this student as having voted
+            const votedUsers = JSON.parse(localStorage.getItem('votedUsers'));
+            votedUsers.push(studentId);
+            localStorage.setItem('votedUsers', JSON.stringify(votedUsers));
+
+            // Show success screen
+            showScreen('successScreen');
+        }
+
+        function showAdmin() {
+            const password = prompt('Enter instructor password:');
+            if (password !== 'Manchester2025') {
+                alert('Incorrect password. Access denied.');
+                return;
+            }
+            
+            const votes = JSON.parse(localStorage.getItem('votes'));
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            // Calculate results for Best Startup Idea
+            const ideaResults = Object.entries(votes.idea)
+                .map(([team, count]) => ({ team: parseInt(team), votes: count }))
+                .sort((a, b) => b.votes - a.votes);
+            
+            // Calculate results for Best Startup Pitch
+            const pitchResults = Object.entries(votes.pitch)
+                .map(([team, count]) => ({ team: parseInt(team), votes: count }))
+                .sort((a, b) => b.votes - a.votes);
+            
+            let html = '';
+            
+            // Best Startup Idea Results
+            html += '<div class="result-category">';
+            html += '<h3>Best Startup Idea</h3>';
+            
+            if (ideaResults.length > 0) {
+                const totalIdeaVotes = ideaResults.reduce((sum, r) => sum + r.votes, 0);
+                
+                // Show winner
+                html += `<div class="winner">
+                    <div class="result-team">🏆 Team ${ideaResults[0].team}</div>
+                    <div class="result-votes">${ideaResults[0].votes} votes</div>
+                </div>`;
+                
+                // Show all results
+                ideaResults.forEach(result => {
+                    html += `<div class="result-item">
+                        <span class="result-team">Team ${result.team}</span>
+                        <span class="result-votes">${result.votes}</span>
+                    </div>`;
+                });
+                
+                html += `<div class="total-votes">Total votes: ${totalIdeaVotes}</div>`;
+            } else {
+                html += '<p style="text-align: center; color: var(--text-light);">No votes yet</p>';
+            }
+            
+            html += '</div>';
+            
+            // Best Startup Pitch Results
+            html += '<div class="result-category">';
+            html += '<h3>Best Startup Pitch</h3>';
+            
+            if (pitchResults.length > 0) {
+                const totalPitchVotes = pitchResults.reduce((sum, r) => sum + r.votes, 0);
+                
+                // Show winner
+                html += `<div class="winner">
+                    <div class="result-team">🏆 Team ${pitchResults[0].team}</div>
+                    <div class="result-votes">${pitchResults[0].votes} votes</div>
+                </div>`;
+                
+                // Show all results
+                pitchResults.forEach(result => {
+                    html += `<div class="result-item">
+                        <span class="result-team">Team ${result.team}</span>
+                        <span class="result-votes">${result.votes}</span>
+                    </div>`;
+                });
+                
+                html += `<div class="total-votes">Total votes: ${totalPitchVotes}</div>`;
+            } else {
+                html += '<p style="text-align: center; color: var(--text-light);">No votes yet</p>';
+            }
+            
+            html += '</div>';
+            
+            resultsContainer.innerHTML = html;
+            showScreen('adminScreen');
+        }
+
+        function exportResults() {
+            const votes = JSON.parse(localStorage.getItem('votes'));
+            
+            let csv = 'Category,Team,Votes\n';
+            
+            // Export Best Startup Idea votes
+            Object.entries(votes.idea).forEach(([team, count]) => {
+                csv += `Best Startup Idea,Team ${team},${count}\n`;
+            });
+            
+            // Export Best Startup Pitch votes
+            Object.entries(votes.pitch).forEach(([team, count]) => {
+                csv += `Best Startup Pitch,Team ${team},${count}\n`;
+            });
+            
+            // Create download
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'startup_competition_results.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Reset function for testing
+        function resetVotes() {
+            if (confirm('Are you sure you want to reset all votes? This cannot be undone.')) {
+                localStorage.setItem('votes', JSON.stringify({
+                    idea: {},
+                    pitch: {}
+                }));
+                localStorage.setItem('votedUsers', JSON.stringify([]));
+                alert('All votes have been reset.');
+                showStudentScreen();
+            }
+        }
+
+        // Admin-friendly reset function
+        function resetVotesAdmin() {
+            if (confirm('⚠️ WARNING: This will delete ALL votes and reset the system.\n\nAre you sure you want to continue?')) {
+                localStorage.setItem('votes', JSON.stringify({
+                    idea: {},
+                    pitch: {}
+                }));
+                localStorage.setItem('votedUsers', JSON.stringify([]));
+                alert('✓ All votes have been reset. The system is ready for fresh voting.');
+                showAdmin(); // Refresh the admin screen
+            }
+        }
+    </script>
+</body>
+</html>
